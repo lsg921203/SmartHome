@@ -6,18 +6,20 @@ import queue
 
 
 messageQueue = queue.Queue()
-client_socket_list = []
 commandQueue = queue.Queue()
+client_socket_list = []
+Parts_list = ["Voice","Bell"]
 wait_c_check = False
 wait_m_check = False
 send_c_check = False
-
+activity_check = False
 
 class Application(tk.Frame):
     global commandQueue
     global wait_c_check
     global wait_m_check
     global send_c_check
+    global activity_check
 
     def __init__(self, master=None):
         super().__init__(master)
@@ -55,10 +57,12 @@ class Application(tk.Frame):
         global wait_c_check
         global wait_m_check
         global send_c_check
+        global activity_check
 
         wait_c_check = False
         wait_m_check = False
         send_c_check = False
+        activity_check = False
 
         self.master.destroy()
 
@@ -92,14 +96,40 @@ def wait_message(wait_m_check, client_socket, messageQueue):
 
 def send_command(send_c_check, commandQueue, client_socket_list):
     while send_c_check:
-        if(commandQueue.qsize()>0):
+        if commandQueue.qsize()>0:
             command = commandQueue.get(0)
             for soc in client_socket_list:
                 soc.sendall(command.encode())
 
+def activity(activity_check,messageQueue,commandQueue):
+
+    while activity_check:
+        if messageQueue.qsize()>0:
+            message = messageQueue.get(0)
+            messagelist = message.split(",")
+            if messagelist[0]=="Voice":
+                print("Voice")
+                Voice_Command(messagelist[1],commandQueue)
+            elif messagelist[0]=="Bell":
+                print("Bell")
+            ##여기에 파츠 추가
+
+
+def Voice_Command(message,commandQueue):
+    if(message=="door open"):
+        command = "Bell/kuku,Open"
+        commandQueue.put()
+
 
 
 def main():
+    global wait_c_check
+    global wait_m_check
+    global send_c_check
+    global activity_check
+    global messageQueue
+    global client_socket_list
+    global commandQueue
     mk_dir()
     HOST = '192.168.22.127'#'192.168.103.61'  #server ip
     PORT = 9999         #server port
@@ -131,7 +161,10 @@ def main():
                                              commandQueue,
                                              client_socket_list))
 
-
+    th_activity = threading.Thread(target= activity,
+                                   args=(lambda:activity_check,
+                                         messageQueue,
+                                         commandQueue))
 
 
 app.mainloop()
