@@ -1,63 +1,71 @@
-import _tkinter as tk
+import tkinter as tk
+from tkinter import messagebox
 import socket, os
 import threading
 import queue
 
+
+messageQueue = queue.Queue()
+client_socket_list = []
+commandQueue = queue.Queue()
+wait_c_check = False
+wait_m_check = False
+send_c_check = False
+
+
 class Application(tk.Frame):
+    global commandQueue
+    global wait_c_check
+    global wait_m_check
+    global send_c_check
+
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
-        self.master.geometry('400x600+100+100')  # 윈도우창 크기 1600*900, 위치:100,100
-        self.master.resizable(True, True)
-        self.pack()
+        self.master.geometry('600x600+100+100')  # 윈도우창 크기 1600*900, 위치:100,100
+        #self.master.resizable(True, True)
+        #self.pack()
         self.effect = ['negative', 'sketch', 'pastel', 'watercolor']
         self.create_widgets()
 
     def create_widgets(self):
-        self.ra = []
-        self.dir_l = tk.Label(self, width=10, font=60, text='폴더경로:')
-        self.dir_l.pack()
-        self.dir_e = tk.Entry(self, width=30)  # 입력창
-        self.dir_e.pack()
 
-        self.file_l = tk.Label(self, width=10, font=60, text='파일명:')
-        self.file_l.pack()
-        self.file_e = tk.Entry(self, width=30)  # 입력창
-        self.file_e.pack()
-
-        self.save_btn = tk.Button(self, width=10, font=60, text='촬영')
-        self.save_btn.pack()
-
-        self.effect_l = tk.Label(self, width=10, font=60, text='사진효과')
-        self.effect_l.pack()
-
-        self.radioval = tk.IntVar()
-        for idx, i in enumerate(self.effect):
-            self.ra.append(tk.Radiobutton(self, text=i, variable=self.radioval, value=idx))
-            self.ra[len(self.ra) - 1].pack()
-
-        self.img = tk.PhotoImage(file="")
+        self.img = tk.PhotoImage(file="refs/mic_img.png")
         self.img_viewer = tk.Label(self.master, image=self.img)
-        self.img_viewer.pack()
+        self.img_viewer.place(x=35,y=10)
 
-        self.fname = tk.Label(self.master, text='')
-        self.fname.pack()
+        #self.fname = tk.Label(self.master, text='')
+        #self.fname.pack()
 
-        self.up_soc = tk.Button(self, width=10, font=60, text='socket upload')
-        self.up_soc.pack()
+        self.command1 = tk.Button(self.master, font=60, text='command1', command=self.Button_command1)
+        self.command1.place( x=245 , y=610)
 
-        self.up_web = tk.Button(self, width=10, font=60, text='web upload')
-        self.up_web.pack()
+        self.Exit = tk.Button(self.master, font=60, text='Exit', command=self.Exit)
+        self.Exit.place(x=280, y=555)
+        #self.up_web = tk.Button(self, width=10, font=60, text='web upload')
+        #self.up_web.pack()
+
+    def Button_command1(self):
+        global commandQueue
+        commandQueue.put("role,command1")
+        print("role,command1")
+        print(commandQueue.get(0))
+
+    def Exit(self):
+        global wait_c_check
+        global wait_m_check
+        global send_c_check
+
+        wait_c_check = False
+        wait_m_check = False
+        send_c_check = False
+
+        self.master.destroy()
 
 root = tk.Tk()
 app = Application(master=root)
-wait_c_check = False
-wait_m_check = False
-send_c_check = False
-messageQueue = queue.Queue()
-client_socket_list = []
 
-commandQueue = queue.Queue()
+
 
 def mk_dir():
     if not os.path.isdir('refs'):
