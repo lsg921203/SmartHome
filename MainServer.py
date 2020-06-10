@@ -53,8 +53,12 @@ root = tk.Tk()
 app = Application(master=root)
 wait_c_check = False
 wait_m_check = False
+send_c_check = False
 messageQueue = queue.Queue()
-th_wait_message_list = []
+client_socket_list = []
+
+commandQueue = queue.Queue()
+
 def mk_dir():
     if not os.path.isdir('refs'):
         print('refs 디렉토리 생성')
@@ -63,17 +67,28 @@ def mk_dir():
 def dir_list():
     return os.listdir('refs')
 
-def wait_client(wait_c_check, wait_m_check, server_socket, messageQueue,th_wait_message_list):
+def wait_client(wait_c_check, wait_m_check, server_socket, messageQueue,client_socket_list):
     while wait_c_check:
         client_socket, addr = server_socket.accept()
-        th_wait_message_list.append(client_socket)
-        th_wait_message = threading.Thread(target=wait_client,args=(lambda:wait_m_check,client_socket,messageQueue))
+        client_socket_list.append(client_socket)
+        th_wait_message = threading.Thread(target=wait_client,
+                                           args=(lambda:wait_m_check,
+                                                 client_socket,
+                                                 messageQueue))
 
-def wait_message(wait_m_check, client_socket,messageQueue):
+def wait_message(wait_m_check, client_socket, messageQueue):
     while wait_m_check:
         data = client_socket.recv(1024)
         menu = data.decode()
         messageQueue.put(menu)
+
+def send_command(send_c_check, commandQueue, client_socket_list):
+    while send_c_check:
+        if(commandQueue.qsize()>0):
+            command = commandQueue.get(0)
+            for soc in client_socket_list:
+                soc.sendall(command.encode())
+
 
 
 def main():
@@ -93,14 +108,21 @@ def main():
     #이제 accept할 수 있음을 알림
     server_socket.listen()
 
+    wait_c_check = True
+    wait_m_check = True
     th_wait_client = threading.Thread(target= wait_client,
                                       args=(lambda:wait_c_check,
                                             lambda:wait_m_check,
                                             server_socket,
                                             messageQueue,
-                                            th_wait_message_list))
+                                            client_socket_list))
 
-    #th_command
+    send_c_check = True
+    th_send_command = threading.Thread(target= send_command,
+                                       args=(lambda:send_c_check,
+                                             commandQueue,
+                                             client_socket_list))
+
 
 
 
