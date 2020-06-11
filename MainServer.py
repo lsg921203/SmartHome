@@ -72,7 +72,7 @@ class Application(tk.Frame):
         send_c_check = False
         activity_check = False
 
-        
+
         self.master.destroy()
 
 

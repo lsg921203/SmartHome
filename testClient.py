@@ -15,17 +15,17 @@ class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
-        self.master.geometry('600x600+100+100')  # 윈도우창 크기 1600*900, 위치:100,100
+        self.master.geometry('600x600+100+100')  # 윈도우창 크기 조절
         self.create_widgets()
 
-    def create_widgets(self):
+    def create_widgets(self):# 여기에서 위젯 변경
 
 
 
         self.command1 = tk.Button(self.master, font=60, text='command1', command=self.Button_command1)
         self.command1.place( x=245 , y=610)
 
-        self.Exit = tk.Button(self.master, font=60, text='Exit', command=self.Exit)
+        self.Exit = tk.Button(self.master, font=60, text='Exit', command=self.Exit)# 이건 지우지 말기
         self.Exit.place(x=280, y=555)
         #self.up_web = tk.Button(self, width=10, font=60, text='web upload')
         #self.up_web.pack()
@@ -36,7 +36,7 @@ class Application(tk.Frame):
 
 
 
-    def Exit(self):
+    def Exit(self):# 이건 지우지 말기
         global checkQcheck
         global connect
         connect.sendMessage("Disconnect")
@@ -44,7 +44,8 @@ class Application(tk.Frame):
 
         self.master.destroy()
 ####################################################
-def func1():
+#여기에서 function 추가 수정
+def func1():#
     print("hello")
 
 def func2():
@@ -55,8 +56,8 @@ def checkQueue(checkQcheck,commandQ):
     while checkQcheck:
         if(commandQ.qsize()>0):
             message = commandQ.get(0)
-            if message == "hi":
-                func1()
+            if message == "hi": # 해당 커맨드에 따라서
+                func1()         # 특정 함수 호출
             elif message == "how are you":
                 func2()
     connect.closeSoc()
