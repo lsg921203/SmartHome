@@ -49,9 +49,9 @@ class Application(tk.Frame):
 
     def Button_command1(self):
         global commandQueue
-        commandQueue.put("role,command1")
-        print("role,command1")
-        print(commandQueue.get(0))
+        commandQueue.put("TEST,hi")
+        print("TEST,hi")
+
 
     def Exit(self):
         global wait_c_check
@@ -81,12 +81,14 @@ def dir_list():
 
 def wait_client(wait_c_check, wait_m_check, server_socket, messageQueue,client_socket_list):
     while wait_c_check:
+        print("클라이언트 연결 대기중")
         client_socket, addr = server_socket.accept()
         client_socket_list.append(client_socket)
-        th_wait_message = threading.Thread(target=wait_client,
+        th_wait_message = threading.Thread(target=wait_message,
                                            args=(lambda:wait_m_check,
                                                  client_socket,
                                                  messageQueue))
+        th_wait_message.start()
 
 def wait_message(wait_m_check, client_socket, messageQueue):
     while wait_m_check:
@@ -112,6 +114,8 @@ def activity(activity_check,messageQueue,commandQueue):
                 Voice_Command(messagelist[1],commandQueue)
             elif messagelist[0]=="Bell":
                 print("Bell")
+            elif messagelist[0]=="TEST":
+                print("TEST")
             ##여기에 파츠 추가
 
 
@@ -154,17 +158,21 @@ def main():
                                             server_socket,
                                             messageQueue,
                                             client_socket_list))
+    th_wait_client.start()
 
     send_c_check = True
     th_send_command = threading.Thread(target= send_command,
                                        args=(lambda:send_c_check,
                                              commandQueue,
                                              client_socket_list))
+    th_send_command.start()
 
     th_activity = threading.Thread(target= activity,
                                    args=(lambda:activity_check,
                                          messageQueue,
                                          commandQueue))
+    th_activity.start()
 
 
+main()
 app.mainloop()
