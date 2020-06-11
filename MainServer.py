@@ -3,7 +3,8 @@ from tkinter import messagebox
 import socket, os
 import threading
 import queue
-
+import sys
+import time
 
 messageQueue = queue.Queue()
 commandQueue = queue.Queue()
@@ -13,6 +14,12 @@ wait_c_check = False
 wait_m_check = False
 send_c_check = False
 activity_check = False
+
+HOST = '192.168.22.127'#'192.168.103.61'  #server ip
+PORT = 9999         #server port
+
+#server socket open. socket.AF_INET:주소체계(IPV4), socket.SOCK_STREAM:tcp
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 class Application(tk.Frame):
     global commandQueue
@@ -50,7 +57,8 @@ class Application(tk.Frame):
     def Button_command1(self):
         global commandQueue
         commandQueue.put("TEST,hi")
-        print("TEST,hi")
+        commandQueue.put("TEST/Voice,hi")
+        #print("TEST Voice,hi")
 
 
     def Exit(self):
@@ -64,10 +72,8 @@ class Application(tk.Frame):
         send_c_check = False
         activity_check = False
 
+        
         self.master.destroy()
-
-root = tk.Tk()
-app = Application(master=root)
 
 
 
@@ -80,24 +86,39 @@ def dir_list():
     return os.listdir('refs')
 
 def wait_client(wait_c_check, wait_m_check, server_socket, messageQueue,client_socket_list):
-    while wait_c_check:
+
+
+    while wait_c_check():
         print("클라이언트 연결 대기중")
         client_socket, addr = server_socket.accept()
         client_socket_list.append(client_socket)
         th_wait_message = threading.Thread(target=wait_message,
                                            args=(lambda:wait_m_check,
                                                  client_socket,
-                                                 messageQueue))
+                                                 messageQueue,
+                                                 client_socket_list))
         th_wait_message.start()
+    server_socket.close()
+def wait_message(wait_m_check, client_socket, messageQueue, client_socket_list):
 
-def wait_message(wait_m_check, client_socket, messageQueue):
-    while wait_m_check:
+    while wait_m_check():
         data = client_socket.recv(1024)
-        menu = data.decode()
-        messageQueue.put(menu)
+        message = data.decode()
+        if message.split(",")[1] == "Disconnect":
+            print("Disconnect")
+            print(len(client_socket_list))
+            for idx, soc in enumerate(client_socket_list):
+                if(soc == client_socket):
+                    del client_socket_list[idx]
+                    break
+            print(len(client_socket_list))
+            client_socket.close()
+            wait_m_check = False
+        else:
+            messageQueue.put(message)
 
 def send_command(send_c_check, commandQueue, client_socket_list):
-    while send_c_check:
+    while send_c_check():
         if commandQueue.qsize()>0:
             command = commandQueue.get(0)
             for soc in client_socket_list:
@@ -105,7 +126,7 @@ def send_command(send_c_check, commandQueue, client_socket_list):
 
 def activity(activity_check,messageQueue,commandQueue):
 
-    while activity_check:
+    while activity_check():
         if messageQueue.qsize()>0:
             message = messageQueue.get(0)
             messagelist = message.split(",")
@@ -126,7 +147,7 @@ def Voice_Command(message,commandQueue):
 
 
 
-def main():
+def main(app):
     global wait_c_check
     global wait_m_check
     global send_c_check
@@ -134,12 +155,9 @@ def main():
     global messageQueue
     global client_socket_list
     global commandQueue
+    global server_socket
     mk_dir()
-    HOST = '192.168.22.127'#'192.168.103.61'  #server ip
-    PORT = 9999         #server port
 
-    #server socket open. socket.AF_INET:주소체계(IPV4), socket.SOCK_STREAM:tcp
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     #포트 여러번 바인드하면 발생하는 에러 방지
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -166,13 +184,14 @@ def main():
                                              commandQueue,
                                              client_socket_list))
     th_send_command.start()
-
+    activity_check = True
     th_activity = threading.Thread(target= activity,
                                    args=(lambda:activity_check,
                                          messageQueue,
                                          commandQueue))
     th_activity.start()
 
-
-main()
+root = tk.Tk()
+app = Application(master=root)
+main(app)
 app.mainloop()

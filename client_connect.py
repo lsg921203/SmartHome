@@ -16,18 +16,21 @@ class client_connect:
 
 
     def waitCommand(self):
-        while self.waitCommandCheck:
-            self.data = self.client_socket.recv(1024)
-            self.data = self.data.decode()
-            SplitCommand = self.data.split(",")
-            targetParts = SplitCommand[0].split("/")
-            targetCheck = False
-            for tp in targetParts:
-                if (tp == self.PartsName):
-                    targetCheck = True
-                    break
-            if (targetCheck):
-                self.recvCommandQ.put(SplitCommand[1])
+        try:
+            while self.waitCommandCheck:
+                self.data = self.client_socket.recv(1024)
+                self.data = self.data.decode()
+                SplitCommand = self.data.split(",")
+                targetParts = SplitCommand[0].split("/")
+                targetCheck = False
+                for tp in targetParts:
+                    if (tp == self.PartsName):
+                        targetCheck = True
+                        break
+                if (targetCheck):
+                    self.recvCommandQ.put(SplitCommand[1])
+        except Exception as ex:
+            self.client_socket.close()
 
     def sendMessage(self,message):
         data = self.PartsName + "," + message
@@ -39,3 +42,6 @@ class client_connect:
 
     def exitWaitCommand(self):
         waitCommandCheck = False
+
+    def closeSoc(self):
+        self.client_socket.close()

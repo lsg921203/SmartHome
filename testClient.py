@@ -2,6 +2,7 @@ import client_connect
 import threading
 import queue
 import tkinter as tk
+import time
 ##########################
 checkQcheck =False
 HOST = "192.168.22.127"
@@ -31,13 +32,14 @@ class Application(tk.Frame):
 
     def Button_command1(self):
         global connect
-        connect.sendMessage("TEST,yo")
+        connect.sendMessage("yo")
 
 
 
     def Exit(self):
         global checkQcheck
-
+        global connect
+        connect.sendMessage("Disconnect")
         checkQcheck = False
 
         self.master.destroy()
@@ -49,6 +51,7 @@ def func2():
     print("I'm fine and you")
 
 def checkQueue(checkQcheck,commandQ):
+    global  connect
     while checkQcheck:
         if(commandQ.qsize()>0):
             message = commandQ.get(0)
@@ -56,6 +59,7 @@ def checkQueue(checkQcheck,commandQ):
                 func1()
             elif message == "how are you":
                 func2()
+    connect.closeSoc()
 #################################################################
 def getCommand():
     global checkQcheck
