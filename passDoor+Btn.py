@@ -57,7 +57,8 @@ def bellSPK():  # 초인종 소리, 초인종 눌렀을때 실행함수
     time.sleep(0.03)
     buz.stop()
 
-
+#GPIO.add_event_detect(SW,GPIO.RISING,BellBtn,300)
+#GPIO.remove_event_detect(SW)
 def BellBtn():  # 버튼 입력 대기상태 만들기
     while 1:
         GPIO.wait_for_edge(SW, GPIO.RISING, 300)
@@ -138,7 +139,7 @@ def clear():  # 틀린횟수 초기화
     num_entry.delete(0)
 
 
-def enter(value):  # 키패드에 입력된 값 수신
+def enter(value):  # 키패드에 입력된 값 수신 ########################################
     global passcnt
     num_entry.delete(0, 'end')  # 키패드 entry 초기화
     inputpass = value
@@ -158,7 +159,7 @@ def enter(value):  # 키패드에 입력된 값 수신
         print('비밀번호 틀림!!!\ntry again passcnt : ', passcnt)
 
 
-def button_pressed(value):  # 숫자버튼 커멘드
+def button_pressed(value):  # 숫자버튼 커멘드 #################################################
     label.config(text="")  # 비밀번호가 틀렸습니다 라벨 초기화
     if len(num_entry.get()) > 3:  # 키패드 entry에 4개초과로 입력됐을때 자동전송하고 entry초기화
         enter(num_entry.get())
@@ -221,7 +222,6 @@ canvas.create_image(150, 100, anchor=NW, image=testImage1)
 threading.Thread(target=BellBtn).start()  # gui랑 버튼 입력동시동작 &mainloop앞에 있어야함&
 root.mainloop()
 
-main()
 GPIO.cleanup()
 
 
