@@ -4,8 +4,8 @@ import queue
 import tkinter as tk
 import time
 import RPi.GPIO as GPIO
-import re
-import serial
+#import re
+#import serial
 import picamera
 import video_connect
 
@@ -13,10 +13,10 @@ import video_connect
 checkQcheck =False
 HOST = "192.168.22.127"
 PORT = 9999
-VIDEOPORT2 = 8888
+VIDEOPORT2 = 7777
 connect = client_connect.client_connect(HOST, PORT, "MortorCamera")
 
-ser = serial.Serial('/dev/ttyACM0', 9600, timeout = None)#시리얼 포트 설정
+#ser = serial.Serial('/dev/ttyACM0', 9600, timeout = None)#시리얼 포트 설정
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(12, GPIO.OUT) #서보모터
 
@@ -34,7 +34,7 @@ class Application(tk.Frame):
         self.p.start(0)
         self.servo = 7
         self.beforeAngle = 7
-
+        self.p.ChangeDutyCycle(self.servo)
 
 
 
@@ -76,8 +76,10 @@ class Application(tk.Frame):
     def Exit(self):# 이건 지우지 말기
         global checkQcheck
         global connect
+        self.p.ChangeDutyCycle(7)
         connect.sendMessage("Disconnect")
         checkQcheck = False
+        GPIO.cleanup()
         self.p.stop()
         self.master.destroy()
 ####################################################
