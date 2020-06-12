@@ -47,13 +47,13 @@ class Application(tk.Frame):
         #self.fname.pack()
 
         self.command1 = tk.Button(self.master, font=60, text='command1', command=self.Button_command1)
-        self.command1.place( x=130 , y=610)
+        self.command1.place( x=10 , y=610)
 
         self.command2 = tk.Button(self.master, font=60, text='command2', command=self.Button_command2)
-        self.command2.place(x=10, y=610)
+        self.command2.place(x=130, y=610)
 
-        self.command3 = tk.Button(self.master, font=60, text='command2', command=self.Button_command2)
-        self.command3.place(x=10, y=610)
+        self.command3 = tk.Button(self.master, font=60, text='command3', command=self.Button_command3)
+        self.command3.place(x=250, y=610)
 
         self.Exit = tk.Button(self.master, font=60, text='Exit', command=self.Exit)
         self.Exit.place(x=280, y=555)
@@ -70,9 +70,9 @@ class Application(tk.Frame):
         global commandQueue
         commandQueue.put("Door,warning")
 
-    def Button_command2(self):
+    def Button_command3(self):
         global commandQueue
-        commandQueue.put("Door,warning")
+        commandQueue.put("Video,play")
 
     def Exit(self):
         global wait_c_check
