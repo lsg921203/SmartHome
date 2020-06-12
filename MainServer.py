@@ -85,10 +85,10 @@ def mk_dir():
 def dir_list():
     return os.listdir('refs')
 
-def wait_client(wait_c_check, wait_m_check, server_socket, messageQueue,client_socket_list):
+def wait_client(ld_wcc, wait_m_check, server_socket, messageQueue,client_socket_list):
 
 
-    while wait_c_check():
+    while ld_wcc():
         print("클라이언트 연결 대기중")
         client_socket, addr = server_socket.accept()
         client_socket_list.append(client_socket)
@@ -99,9 +99,10 @@ def wait_client(wait_c_check, wait_m_check, server_socket, messageQueue,client_s
                                                  client_socket_list))
         th_wait_message.start()
     server_socket.close()
-def wait_message(wait_m_check, client_socket, messageQueue, client_socket_list):
+def wait_message(ld_wmc, client_socket, messageQueue, client_socket_list):
 
-    while wait_m_check():
+    while ld_wmc():
+        
         data = client_socket.recv(1024)
         message = data.decode()
         if message.split(",")[1] == "Disconnect":
@@ -113,20 +114,20 @@ def wait_message(wait_m_check, client_socket, messageQueue, client_socket_list):
                     break
             print(len(client_socket_list))
             client_socket.close()
-            wait_m_check = False
+            break
         else:
             messageQueue.put(message)
 
-def send_command(send_c_check, commandQueue, client_socket_list):
-    while send_c_check():
+def send_command(ld_scc, commandQueue, client_socket_list):
+    while ld_scc():
         if commandQueue.qsize()>0:
             command = commandQueue.get(0)
             for soc in client_socket_list:
                 soc.sendall(command.encode())
 
-def activity(activity_check,messageQueue,commandQueue):
+def activity(ld_ac,messageQueue,commandQueue):
 
-    while activity_check():
+    while ld_ac():
         if messageQueue.qsize()>0:
             message = messageQueue.get(0)
             messagelist = message.split(",")
@@ -172,7 +173,7 @@ def main(app):
     wait_m_check = True
     th_wait_client = threading.Thread(target= wait_client,
                                       args=(lambda:wait_c_check,
-                                            lambda:wait_m_check,
+                                            wait_m_check,
                                             server_socket,
                                             messageQueue,
                                             client_socket_list))
