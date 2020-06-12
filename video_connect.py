@@ -16,6 +16,7 @@ class video_connect:
         f.close()
 
         self.client_socket.sendall(body)
+        
 
 
     def closeSoc(self):

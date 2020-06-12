@@ -258,15 +258,18 @@ class Application(tk.Frame):
         GPIO.cleanup()
         self.master.destroy()
 
- def camera_on(ld_coc):
-     v_connect = video_connect.video_connect(HOST, VIDEOPORT1, 0)
-     c = picamera.PiCamera()
-     c.resolution = (320, 240)
-     path = "refs/tmp.png"
-     while(ld_coc()):
-         c.capture(path)
-         v_connect.sendImage(path)
-     v_connect.closeSoc()
+def camera_on(ld_coc):
+    v_connect = video_connect.video_connect(HOST, VIDEOPORT1, 0)
+    c = picamera.PiCamera()
+    c.resolution = (150, 100)
+    path = "refs/tmp.png"
+    print(ld_coc())
+    while(ld_coc()):
+        c.capture(path)
+        v_connect.sendImage(path)
+        time.sleep(0.3)
+    v_connect.closeSoc()
+    c.close()
 ###############################################
 root = tk.Tk()
 A = Application(root)
