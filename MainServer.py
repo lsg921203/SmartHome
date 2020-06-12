@@ -47,19 +47,32 @@ class Application(tk.Frame):
         #self.fname.pack()
 
         self.command1 = tk.Button(self.master, font=60, text='command1', command=self.Button_command1)
-        self.command1.place( x=245 , y=610)
+        self.command1.place( x=10 , y=610)
+
+        self.command2 = tk.Button(self.master, font=60, text='command2', command=self.Button_command2)
+        self.command2.place(x=130, y=610)
+
+        self.command3 = tk.Button(self.master, font=60, text='command3', command=self.Button_command3)
+        self.command3.place(x=250, y=610)
 
         self.Exit = tk.Button(self.master, font=60, text='Exit', command=self.Exit)
         self.Exit.place(x=280, y=555)
+
         #self.up_web = tk.Button(self, width=10, font=60, text='web upload')
         #self.up_web.pack()
 
     def Button_command1(self):
         global commandQueue
-        commandQueue.put("TEST,hi")
-        commandQueue.put("TEST/Voice,hi")
-        #print("TEST Voice,hi")
+        commandQueue.put("Door,door open")
 
+        #print("TEST Voice,hi")
+    def Button_command2(self):
+        global commandQueue
+        commandQueue.put("Door,warning")
+
+    def Button_command3(self):
+        global commandQueue
+        commandQueue.put("Video,play")
 
     def Exit(self):
         global wait_c_check
@@ -134,8 +147,8 @@ def activity(ld_ac,messageQueue,commandQueue):
             if messagelist[0]=="Voice":
                 print("Voice")
                 Voice_Command(messagelist[1],commandQueue)
-            elif messagelist[0]=="Bell":
-                print("Bell")
+            elif messagelist[0]=="Door":
+                print("Door")
             elif messagelist[0]=="TEST":
                 print("TEST")
             ##여기에 파츠 추가
