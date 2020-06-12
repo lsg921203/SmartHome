@@ -96,6 +96,7 @@ def camera_on(ld_coc):
     c.resolution = (150, 100)
     path = "refs/tmp.png"
     print(ld_coc())
+    
     while(ld_coc()):
         c.capture(path)
         v_connect.sendImage(path)
