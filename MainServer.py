@@ -15,12 +15,14 @@ wait_m_check = False
 send_c_check = False
 activity_check = False
 
-HOST = '192.168.22.127'#'192.168.103.61'  #server ip
+HOST = "localhost"#'192.168.22.127'#'192.168.103.61'  #server ip
 PORT = 9999         #server port
-
+VIDEOPORT1 = 8888
+VIDEOPORT2 = 7777
 #server socket open. socket.AF_INET:주소체계(IPV4), socket.SOCK_STREAM:tcp
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+server_video_socket1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_video_socket2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 class Application(tk.Frame):
     global commandQueue
     global wait_c_check
@@ -39,7 +41,7 @@ class Application(tk.Frame):
 
     def create_widgets(self):
 
-        self.img = tk.PhotoImage(file="refs/mic_img.png")
+        self.img = tk.PhotoImage(file="")#file="refs/mic_img.png"
         self.img_viewer = tk.Label(self.master, image=self.img)
         self.img_viewer.place(x=35,y=10)
 
@@ -99,11 +101,13 @@ def dir_list():
     return os.listdir('refs')
 
 def wait_client(ld_wcc, wait_m_check, server_socket, messageQueue,client_socket_list):
-
-
+    server_socket.settimeout(0.5)
     while ld_wcc():
-        print("클라이언트 연결 대기중")
-        client_socket, addr = server_socket.accept()
+        try:
+            client_socket, addr = server_socket.accept()
+        except socket.timeout :
+            continue
+        print("클라이언트 연결")
         client_socket_list.append(client_socket)
         th_wait_message = threading.Thread(target=wait_message,
                                            args=(lambda:wait_m_check,
@@ -111,12 +115,15 @@ def wait_client(ld_wcc, wait_m_check, server_socket, messageQueue,client_socket_
                                                  messageQueue,
                                                  client_socket_list))
         th_wait_message.start()
+    print("close wait client thread!")
     server_socket.close()
 def wait_message(ld_wmc, client_socket, messageQueue, client_socket_list):
-
+    client_socket.settimeout(0.5)
     while ld_wmc():
-        
-        data = client_socket.recv(1024)
+        try:
+            data = client_socket.recv(1024)
+        except socket.timeout :
+            continue
         message = data.decode()
         if message.split(",")[1] == "Disconnect":
             print("Disconnect")
@@ -130,6 +137,7 @@ def wait_message(ld_wmc, client_socket, messageQueue, client_socket_list):
             break
         else:
             messageQueue.put(message)
+    print("close wait message thread!")
 
 def send_command(ld_scc, commandQueue, client_socket_list):
     while ld_scc():
@@ -137,6 +145,7 @@ def send_command(ld_scc, commandQueue, client_socket_list):
             command = commandQueue.get(0)
             for soc in client_socket_list:
                 soc.sendall(command.encode())
+    print("close send command thread!")
 
 def activity(ld_ac,messageQueue,commandQueue):
 
@@ -152,6 +161,7 @@ def activity(ld_ac,messageQueue,commandQueue):
             elif messagelist[0]=="TEST":
                 print("TEST")
             ##여기에 파츠 추가
+    print("close activity thread!")
 
 
 def Voice_Command(message,commandQueue):
