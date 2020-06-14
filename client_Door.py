@@ -5,7 +5,8 @@ import time, os, threading
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
-
+import picamera
+import video_connect
 GPIO.setmode(GPIO.BOARD)
 
 SW = 7  # 버튼
@@ -24,12 +25,17 @@ buz = GPIO.PWM(pin, 100)
 
 GPIO.setup(SW, GPIO.IN)  # switch
 
+camera_on_check =False
 
 ##########################
 checkQcheck =False
 HOST = "192.168.22.127"
 PORT = 9999
+VIDEOPORT1 = 8888
 connect = client_connect.client_connect(HOST, PORT, "Door")
+
+
+
 ####
 
 
@@ -251,7 +257,16 @@ class Application(tk.Frame):
         GPIO.remove_event_detect(SW)
         GPIO.cleanup()
         self.master.destroy()
-        
+
+ def camera_on(ld_coc):
+     v_connect = video_connect.video_connect(HOST, VIDEOPORT1, 0)
+     c = picamera.PiCamera()
+     c.resolution = (320, 240)
+     path = "refs/tmp.png"
+     while(ld_coc()):
+         c.capture(path)
+         v_connect.sendImage(path)
+     v_connect.closeSoc()
 ###############################################
 root = tk.Tk()
 A = Application(root)
@@ -263,6 +278,7 @@ GPIO.add_event_detect(SW,GPIO.RISING,A.BellBtn,1000)
 
 def checkQueue(checkQcheck,commandQ):
     global  connect
+    global camera_on_check
     while checkQcheck:
         if(commandQ.qsize()>0):
             message = commandQ.get(0)
@@ -272,6 +288,12 @@ def checkQueue(checkQcheck,commandQ):
                 A.warTh()
             elif message == "get state":
                 connect.sendMessage(A.state)
+            elif message == "start camera":
+                camera_on_check =True
+                th = threading.Thread(target=camera_on,args=(lambda :camera_on_check,))
+                th.start()
+            elif message == "end camera":
+                camera_on_check = False
     connect.closeSoc()
 #################################################################
 def getCommand():

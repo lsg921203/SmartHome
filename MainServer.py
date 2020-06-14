@@ -40,20 +40,25 @@ class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
-        self.master.geometry('600x600+100+100')  # 윈도우창 크기 1600*900, 위치:100,100
+        self.master.geometry('670x300+100+100')  # 윈도우창 크기 1600*900, 위치:100,100
         #self.master.resizable(True, True)
         #self.pack()
         self.effect = ['negative', 'sketch', 'pastel', 'watercolor']
         self.create_widgets()
         self.video_q_reader_check = True
-        ##thread ^ 이거 해주기
+
+
 
     def create_widgets(self):
 
-        self.img = tk.PhotoImage(file="")#file="refs/mic_img.png"
-        self.img_viewer = tk.Label(self.master, image=self.img)
-        self.img_viewer.place(x=35,y=10)
+        self.img = tk.PhotoImage(file="refs/mic_img.png")#file="refs/mic_img.png"
+        self.img_viewer1 = tk.Canvas(height=240, width=320)
+        self.img_viewer1.place(x=10,y=10)
+        self.img_viewer1.create_image(0,0,anchor='nw',image=self.img)
 
+        self.img_viewer2 = tk.Canvas(height=240, width=320)
+        self.img_viewer2.place(x=340, y=10)
+        self.img_viewer2.create_image(0, 0, anchor='nw', image=self.img)
         #self.fname = tk.Label(self.master, text='')
         #self.fname.pack()
 
@@ -67,20 +72,11 @@ class Application(tk.Frame):
         self.command3.place(x=250, y=610)
 
         self.Exit = tk.Button(self.master, font=60, text='Exit', command=self.Exit)
-        self.Exit.place(x=280, y=555)
+        self.Exit.place(x=320, y=260)
 
         #self.up_web = tk.Button(self, width=10, font=60, text='web upload')
         #self.up_web.pack()
 
-    def video_q_reader(self,videoNum):
-        global frame_queue_list
-        path = 'myVideo/transimg.png'
-        while(self.video_q_reader_check):
-            if(len(frame_queue_list[videoNum])>0):
-                f = open(path,'wb')
-                f.write(frame_queue_list[videoNum].get(0))
-                f.close()
-                ################## 이거 하던중
 
 
     def Button_command1(self):
@@ -110,6 +106,7 @@ class Application(tk.Frame):
         activity_check = False
         wait_v_check = False
         wait_f_check = False
+        self.video_q_reader_check = False
 
         self.master.destroy()
 
@@ -167,6 +164,7 @@ def wait_message(ld_wmc, client_socket, messageQueue, client_socket_list):
     print("close wait message thread!")
 
 def wait_video(ld_wvc,wait_frame_check,video_num, server_socket,video_list):
+    print("start wait_video thread")
     server_socket.settimeout(0.5)
     while ld_wvc():
         try:
@@ -176,12 +174,12 @@ def wait_video(ld_wvc,wait_frame_check,video_num, server_socket,video_list):
         print("video1 연결")
         video_list[video_num] = client_socket
         th_wait_message = threading.Thread(target=wait_frame,
-                                           args=(lambda: wait_frame_check,
+                                           args=(lambda: wait_frame_check(),
                                                  client_socket,
                                                  video_num,
                                                  video_list))
         th_wait_message.start()
-    print("close wait video"+video_num+" thread!")
+    print("close wait video"+str(video_num)+" thread!")
     server_socket.close()
 def wait_frame(ld_wfc, client_socket,video_num, video_list):
     global frame_queue_list
@@ -210,7 +208,30 @@ def send_command(ld_scc, commandQueue, client_socket_list):
                 soc.sendall(command.encode())
     print("close send command thread!")
 
+def video_q_reader(app,videoNum):
+    global frame_queue_list
+    print("start video_q_reader thread")
+    if (videoNum == 0):
+        path = 'refs/video1_frame.png'
+    elif (videoNum == 1):
+        path = 'refs/video2_frame.png'
 
+    while(app.video_q_reader_check):
+        try:
+            if (frame_queue_list[videoNum].qsize() > 0):
+                f = open(path, 'wb')
+                f.write(frame_queue_list[videoNum].get(0))
+                f.close()
+                ################## 이거 하던중
+                image = tk.PhotoImage(file=path)
+                if (videoNum == 0):
+                    app.img_viewer1.create_image(0, 0, anchor='nw', image=image)
+                elif (videoNum == 1):
+                    app.img_viewer2.create_image(0, 0, anchor='nw', image=image)
+        except Exception as e:
+            print(e)
+            break
+    print("close video_q_reader thread")
 ###################################################################
 def Voice_Command(message,commandQueue):
     if(message=="door open"):
@@ -288,16 +309,33 @@ def main(app):
                                          commandQueue))
     th_activity.start()
 
+    global wait_v_check
+    global wait_f_check
     wait_v_check = True
     wait_f_check = True
-    for i in range(2):
-        threading.Thread(target=wait_video,
-                         args=(lambda: wait_v_check,
-                               lambda: wait_f_check,
-                               i,
-                               video_socket_list))
 
+    th = threading.Thread(target=wait_video,
+                          args=(lambda: wait_v_check,
+                                lambda: wait_f_check,
+                                0,
+                                server_video_socket1,
+                                video_socket_list))
+    th.start()
 
+    th = threading.Thread(target=wait_video,
+                          args=(lambda: wait_v_check,
+                                lambda: wait_f_check,
+                                1,
+                                server_video_socket2,
+                                video_socket_list))
+    th.start()
+
+    th = threading.Thread(target=video_q_reader,
+                                args=(app,0))
+    th.start()
+    th = threading.Thread(target=video_q_reader,
+                                args=(app,1))
+    th.start()
 
 root = tk.Tk()
 app = Application(master=root)
