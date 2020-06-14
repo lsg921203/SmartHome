@@ -8,12 +8,19 @@ import time
 
 messageQueue = queue.Queue()
 commandQueue = queue.Queue()
+vedio1_frame_q = queue.Queue()
+vedio2_frame_q = queue.Queue()
+frame_queue_list = [vedio1_frame_q,vedio2_frame_q]
+video_socket_list = [None,None]
 client_socket_list = []
 Parts_list = ["Voice","Bell"]
 wait_c_check = False
 wait_m_check = False
+wait_v_check = False
+wait_f_check = False
 send_c_check = False
 activity_check = False
+
 
 HOST = "localhost"#'192.168.22.127'#'192.168.103.61'  #server ip
 PORT = 9999         #server port
@@ -38,6 +45,8 @@ class Application(tk.Frame):
         #self.pack()
         self.effect = ['negative', 'sketch', 'pastel', 'watercolor']
         self.create_widgets()
+        self.video_q_reader_check = True
+        ##thread ^ 이거 해주기
 
     def create_widgets(self):
 
@@ -63,6 +72,17 @@ class Application(tk.Frame):
         #self.up_web = tk.Button(self, width=10, font=60, text='web upload')
         #self.up_web.pack()
 
+    def video_q_reader(self,videoNum):
+        global frame_queue_list
+        path = 'myVideo/transimg.png'
+        while(self.video_q_reader_check):
+            if(len(frame_queue_list[videoNum])>0):
+                f = open(path,'wb')
+                f.write(frame_queue_list[videoNum].get(0))
+                f.close()
+                ################## 이거 하던중
+
+
     def Button_command1(self):
         global commandQueue
         commandQueue.put("Door,door open")
@@ -81,12 +101,15 @@ class Application(tk.Frame):
         global wait_m_check
         global send_c_check
         global activity_check
+        global wait_v_check
+        global wait_f_check
 
         wait_c_check = False
         wait_m_check = False
         send_c_check = False
         activity_check = False
-
+        wait_v_check = False
+        wait_f_check = False
 
         self.master.destroy()
 
@@ -110,7 +133,7 @@ def wait_client(ld_wcc, wait_m_check, server_socket, messageQueue,client_socket_
         print("클라이언트 연결")
         client_socket_list.append(client_socket)
         th_wait_message = threading.Thread(target=wait_message,
-                                           args=(lambda:wait_m_check,
+                                           args=(lambda:wait_m_check(),
                                                  client_socket,
                                                  messageQueue,
                                                  client_socket_list))
@@ -124,6 +147,9 @@ def wait_message(ld_wmc, client_socket, messageQueue, client_socket_list):
             data = client_socket.recv(1024)
         except socket.timeout :
             continue
+        except Exception as e:
+            print(e)
+            break
         message = data.decode()
         if message.split(",")[1] == "Disconnect":
             print("Disconnect")
@@ -133,10 +159,47 @@ def wait_message(ld_wmc, client_socket, messageQueue, client_socket_list):
                     del client_socket_list[idx]
                     break
             print(len(client_socket_list))
-            client_socket.close()
+
             break
         else:
             messageQueue.put(message)
+    client_socket.close()
+    print("close wait message thread!")
+
+def wait_video(ld_wvc,wait_frame_check,video_num, server_socket,video_list):
+    server_socket.settimeout(0.5)
+    while ld_wvc():
+        try:
+            client_socket, addr = server_socket.accept()
+        except socket.timeout:
+            continue
+        print("video1 연결")
+        video_list[video_num] = client_socket
+        th_wait_message = threading.Thread(target=wait_frame,
+                                           args=(lambda: wait_frame_check,
+                                                 client_socket,
+                                                 video_num,
+                                                 video_list))
+        th_wait_message.start()
+    print("close wait video"+video_num+" thread!")
+    server_socket.close()
+def wait_frame(ld_wfc, client_socket,video_num, video_list):
+    global frame_queue_list
+    client_socket.settimeout(0.5)
+    while ld_wfc():
+        try:
+            data = client_socket.recv(50000)
+        except socket.timeout:
+            continue
+        except Exception as e:
+            print(e)
+            break
+        frame_queue_list[video_num].put(data)
+
+    video_list[video_num] = None
+    client_socket.close()
+
+
     print("close wait message thread!")
 
 def send_command(ld_scc, commandQueue, client_socket_list):
@@ -147,6 +210,13 @@ def send_command(ld_scc, commandQueue, client_socket_list):
                 soc.sendall(command.encode())
     print("close send command thread!")
 
+
+###################################################################
+def Voice_Command(message,commandQueue):
+    if(message=="door open"):
+        command = "Bell/kuku,Open"
+        commandQueue.put()
+###################################################################
 def activity(ld_ac,messageQueue,commandQueue):
 
     while ld_ac():
@@ -164,10 +234,6 @@ def activity(ld_ac,messageQueue,commandQueue):
     print("close activity thread!")
 
 
-def Voice_Command(message,commandQueue):
-    if(message=="door open"):
-        command = "Bell/kuku,Open"
-        commandQueue.put()
 
 
 
@@ -180,23 +246,30 @@ def main(app):
     global client_socket_list
     global commandQueue
     global server_socket
+    global server_video_socket1
+    global server_video_socket2
+    global video_socket_list
     mk_dir()
 
 
     #포트 여러번 바인드하면 발생하는 에러 방지
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
+    server_video_socket1.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server_video_socket2.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     #바인드:오픈한 소켓에 IP와 PORT 할당
     server_socket.bind((HOST, PORT))
-
+    server_video_socket1.bind((HOST, VIDEOPORT1))
+    server_video_socket2.bind((HOST, VIDEOPORT2))
     #이제 accept할 수 있음을 알림
     server_socket.listen()
+    server_video_socket1.listen()
+    server_video_socket2.listen()
 
     wait_c_check = True
     wait_m_check = True
     th_wait_client = threading.Thread(target= wait_client,
-                                      args=(lambda:wait_c_check,
-                                            wait_m_check,
+                                      args=(lambda: wait_c_check,
+                                            lambda: wait_m_check,
                                             server_socket,
                                             messageQueue,
                                             client_socket_list))
@@ -214,6 +287,17 @@ def main(app):
                                          messageQueue,
                                          commandQueue))
     th_activity.start()
+
+    wait_v_check = True
+    wait_f_check = True
+    for i in range(2):
+        threading.Thread(target=wait_video,
+                         args=(lambda: wait_v_check,
+                               lambda: wait_f_check,
+                               i,
+                               video_socket_list))
+
+
 
 root = tk.Tk()
 app = Application(master=root)
