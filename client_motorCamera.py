@@ -13,7 +13,7 @@ import video_connect
 checkQcheck =False
 HOST = "192.168.22.127"
 PORT = 9999
-VIDEOPORT1 = 8888
+VIDEOPORT2 = 8888
 connect = client_connect.client_connect(HOST, PORT, "MortorCamera")
 
 ser = serial.Serial('/dev/ttyACM0', 9600, timeout = None)#시리얼 포트 설정
@@ -91,7 +91,7 @@ def func2():
     print("I'm fine and you")
 
 def camera_on(ld_coc):
-    v_connect = video_connect.video_connect(HOST, VIDEOPORT1, 1)
+    v_connect = video_connect.video_connect(HOST, VIDEOPORT2, 1)
     c = picamera.PiCamera()
     c.resolution = (150, 100)
     path = "refs/tmp.png"
