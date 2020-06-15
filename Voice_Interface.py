@@ -7,10 +7,10 @@ import voice_machine
 ##########################
 checkQcheck =False
 #HOST = "192.168.22.127"#LSG(SungGyeol)
-HOST = "192.168.22.92"#NYK
+HOST = "192.168.22.157"#NYK
 PORT = 9999
 connect = client_connect.client_connect(HOST, PORT, "Voice")
-targetParts=[["door","closed"], ["light","off"], ["curtain","closed"], ["AC","off"], ["TV","off"]]
+targetParts=[["door","closed"], ["LED","off","None"], ["window","closed"], ["AC","off"], ["TV","off"]]
 vcm=voice_machine.voice_machine(targetParts)
 #########################################
 class Application(tk.Frame):
