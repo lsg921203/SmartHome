@@ -99,7 +99,7 @@ class Application(tk.Frame):
         #wait_f_check = False
         commandQueue.put("MortorCamera,end camera")
 
-    def Button_command3(self):
+    def Button_command4(self):
         global commandQueue
         #wait_f_check = False
         commandQueue.put("MortorCamera,2")
