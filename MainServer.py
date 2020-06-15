@@ -72,6 +72,9 @@ class Application(tk.Frame):
         self.command3 = tk.Button(self.master, font=60, text='command3', command=self.Button_command3)
         self.command3.place(x=250, y=610)
 
+        self.command4 = tk.Button(self.master, font=60, text='command3', command=self.Button_command4)
+        self.command4.place(x=370, y=610)
+
         self.Exit = tk.Button(self.master, font=60, text='Exit', command=self.Exit)
         self.Exit.place(x=320, y=260)
 
@@ -82,19 +85,24 @@ class Application(tk.Frame):
 
     def Button_command1(self):
         global commandQueue
-        commandQueue.put("Door,door open")
+        commandQueue.put("MortorCamera,1")
 
         #print("TEST Voice,hi")
     def Button_command2(self):
         global commandQueue
         global wait_f_check
         wait_f_check = True
-        commandQueue.put("Door,start camera")
+        commandQueue.put("MortorCamera,start camera")
 
     def Button_command3(self):
         global commandQueue
         #wait_f_check = False
-        commandQueue.put("Door,end camera")
+        commandQueue.put("MortorCamera,end camera")
+
+    def Button_command3(self):
+        global commandQueue
+        #wait_f_check = False
+        commandQueue.put("MortorCamera,2")
 
     def Exit(self):
         global wait_c_check
