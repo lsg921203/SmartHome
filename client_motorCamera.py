@@ -33,9 +33,9 @@ class Application(tk.Frame):
         self.p = GPIO.PWM(12, 50)
         self.p.start(0)
         self.servo = 7
-        self.control_servo_check = True
-        th = threading.Thread(target=self.control_servo)
-        th.start()
+        self.beforeAngle = 7
+
+
 
 
     def create_widgets(self):# 여기에서 위젯 변경
@@ -52,35 +52,33 @@ class Application(tk.Frame):
         global connect
         connect.sendMessage("yo")
 
-    def control_servo(self):
-        before_angle = 7
-        while self.control_servo_check:
-            joy = str(ser.readline())  # 아두이노에서 들어온 시리얼값 저장
-            num = re.findall("\d+", joy)  # 시리얼값에서 필요한 부분만 저장
-            print(num)
-            if int(num[0]) == 1:
-                self.servo -= 1
-            elif int(num[0]) == 2:
-                self.servo += 1
+    def control_servo(self,num):
+        self.beforeAngle = 7
 
-            if self.servo<=2:
-                self.servo=3
-            elif self.servo>=12:
-                self.servo=11
+        print(num)
+        if int(num) == 1:
+            self.servo -= 1
+        elif int(num) == 2:
+            self.servo += 1
 
-            if 2 < self.servo and self.servo < 12:
-                if( self.servo != before_angle):
-                    self.p.ChangeDutyCycle(self.servo)
-                    before_angle = self.servo
-            del (num)  # 원래 들어있던 조이스틱 값 삭제
-        self.p.stop()
+        if self.servo <= 2:
+            self.servo = 3
+        elif self.servo >= 12:
+            self.servo = 11
+
+        if 2 < self.servo and self.servo < 12:
+            if (self.servo != self.beforeAngle):
+                self.p.ChangeDutyCycle(self.servo)
+                self.beforeAngle = self.servo
+
+
 
     def Exit(self):# 이건 지우지 말기
         global checkQcheck
         global connect
         connect.sendMessage("Disconnect")
         checkQcheck = False
-        self.control_servo_check = False
+        self.p.stop()
         self.master.destroy()
 ####################################################
 #여기에서 function 추가 수정
@@ -106,6 +104,7 @@ def camera_on(ld_coc):
 def checkQueue(checkQcheck,commandQ):
     global connect
     global camera_on_check
+    global A
     while checkQcheck:
         if(commandQ.qsize()>0):
             message = commandQ.get(0)
@@ -119,6 +118,8 @@ def checkQueue(checkQcheck,commandQ):
                 th.start()
             elif message == "end camera":
                 camera_on_check = False
+            elif message == "1" or "2":
+                A.control_servo(message)
     connect.closeSoc()
 #################################################################
 def getCommand():
@@ -130,10 +131,11 @@ def getCommand():
     t1 = threading.Thread(target=checkQueue, args=(lambda:checkQcheck,connect.getCommandQueue()))
     t1.start()
 
-def main():
-    root = tk.Tk()
-    A = Application(root)
+def main(root):
+
     getCommand()
     root.mainloop()
 
-main()
+root = tk.Tk()
+A = Application(root)
+main(root)
