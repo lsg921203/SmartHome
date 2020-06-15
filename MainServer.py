@@ -8,6 +8,7 @@ import time
 
 messageQueue = queue.Queue()
 commandQueue = queue.Queue()
+
 vedio1_frame_q = queue.Queue()
 vedio2_frame_q = queue.Queue()
 frame_queue_list = [vedio1_frame_q,vedio2_frame_q]
@@ -22,7 +23,7 @@ send_c_check = False
 activity_check = False
 
 
-HOST = "localhost"#'192.168.22.127'#'192.168.103.61'  #server ip
+HOST = "192.168.22.127"#'192.168.22.127'#'192.168.103.61'  #server ip
 PORT = 9999         #server port
 VIDEOPORT1 = 8888
 VIDEOPORT2 = 7777
@@ -86,11 +87,14 @@ class Application(tk.Frame):
         #print("TEST Voice,hi")
     def Button_command2(self):
         global commandQueue
-        commandQueue.put("Door,warning")
+        global wait_f_check
+        wait_f_check = True
+        commandQueue.put("Door,start camera")
 
     def Button_command3(self):
         global commandQueue
-        commandQueue.put("Video,play")
+        #wait_f_check = False
+        commandQueue.put("Door,end camera")
 
     def Exit(self):
         global wait_c_check
@@ -183,7 +187,9 @@ def wait_video(ld_wvc,wait_frame_check,video_num, server_socket,video_list):
     server_socket.close()
 def wait_frame(ld_wfc, client_socket,video_num, video_list):
     global frame_queue_list
-    client_socket.settimeout(0.5)
+    #client_socket.settimeout(2)
+    print("start wait frame thread"+str(video_num))
+    print(ld_wfc())
     while ld_wfc():
         try:
             data = client_socket.recv(50000)
@@ -192,13 +198,15 @@ def wait_frame(ld_wfc, client_socket,video_num, video_list):
         except Exception as e:
             print(e)
             break
+        time.sleep(0.3)
         frame_queue_list[video_num].put(data)
+        print(frame_queue_list[video_num].qsize())
 
     video_list[video_num] = None
     client_socket.close()
 
 
-    print("close wait message thread!")
+    print("close wait frame thread!")
 
 def send_command(ld_scc, commandQueue, client_socket_list):
     while ld_scc():
@@ -210,6 +218,7 @@ def send_command(ld_scc, commandQueue, client_socket_list):
 
 def video_q_reader(app,videoNum):
     global frame_queue_list
+    global wait_f_check
     print("start video_q_reader thread")
     if (videoNum == 0):
         path = 'refs/video1_frame.png'
@@ -229,8 +238,13 @@ def video_q_reader(app,videoNum):
                 elif (videoNum == 1):
                     app.img_viewer2.create_image(0, 0, anchor='nw', image=image)
         except Exception as e:
+            print("in video_q_reader")
             print(e)
-            break
+            a = frame_queue_list[videoNum].get()
+            wait_f_check = False
+            continue
+
+
     print("close video_q_reader thread")
 ###################################################################
 def Voice_Command(message,commandQueue):
