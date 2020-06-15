@@ -251,6 +251,14 @@ def Voice_Command(message,commandQueue):
     if(message=="door open"):
         command = "Bell/kuku,Open"
         commandQueue.put()
+def Door_activity(message,commandQueue):
+    if(message=="bell"):
+        global wait_f_check
+        wait_f_check = True
+        commandQueue.put("Door,start camera")
+        #time.sleep(10)
+        #commandQueue.put("Door,end camera")
+
 ###################################################################
 def activity(ld_ac,messageQueue,commandQueue):
 
@@ -263,6 +271,7 @@ def activity(ld_ac,messageQueue,commandQueue):
                 Voice_Command(messagelist[1],commandQueue)
             elif messagelist[0]=="Door":
                 print("Door")
+                Door_activity(messagelist[1],commandQueue)
             elif messagelist[0]=="TEST":
                 print("TEST")
             ##여기에 파츠 추가
