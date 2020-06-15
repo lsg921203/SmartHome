@@ -167,10 +167,12 @@ class Application(tk.Frame):
 
 
     def BellBtn(self,p):  # 버튼 입력 대기상태 만들기
+        global connect
         
-        print('pushed')
+        connect.sendMessage("bell")
+        print('bell')
         self.bellSPK()
-        print('ready')
+        
 
 
     def openSPK(self):  # 도어오픈 스피커
