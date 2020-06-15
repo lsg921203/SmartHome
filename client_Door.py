@@ -52,7 +52,9 @@ class Application(tk.Frame):
         self.entry_value = StringVar(root, value='')
         self.create_widgets()
         self.state = "0"
-
+        self.bell_Botton_Check = True
+        th = threading.Thread(target=self.BellBtn)
+        th.start()
     def create_widgets(self):# 여기에서 위젯 변경
         self.num_entry = ttk.Entry(self.root, textvariable=self.entry_value, width=20)
         self.num_entry.place(x=10, y=0)
@@ -166,12 +168,14 @@ class Application(tk.Frame):
         buz.stop()
 
 
-    def BellBtn(self,p):  # 버튼 입력 대기상태 만들기
+    def BellBtn(self):  # 버튼 입력 대기상태 만들기
         global connect
-        
-        connect.sendMessage("bell")
-        print('bell')
-        self.bellSPK()
+        while self.bell_Botton_Check:
+            GPIO.wait_for_edge(SW,GPIO.RISING,300)
+            connect.sendMessage("bell")
+            print('bell')
+            self.bellSPK()
+            time.sleep(0.3)
         
 
 
@@ -256,7 +260,8 @@ class Application(tk.Frame):
         global connect
         connect.sendMessage("Disconnect")
         checkQcheck = False
-        GPIO.remove_event_detect(SW)
+        #GPIO.remove_event_detect(SW)######
+        self.bell_Botton_Check = False
         GPIO.cleanup()
         self.master.destroy()
 
@@ -275,7 +280,7 @@ def camera_on(ld_coc):
 ###############################################
 root = tk.Tk()
 A = Application(root)
-GPIO.add_event_detect(SW,GPIO.RISING,A.BellBtn,1000)
+#GPIO.add_event_detect(SW,GPIO.RISING,A.BellBtn,500)########
 
 ####################################################
 #여기에서 function 추가 수정
