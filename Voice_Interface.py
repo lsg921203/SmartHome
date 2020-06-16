@@ -29,6 +29,8 @@ class Application(tk.Frame):
         self.create_widgets()
         self.state = "0"
         self.input_joystick_check = True
+        th = threading.Thread(target= self.input_joystick)
+        th.start()
 
     def create_widgets(self):  # 여기에서 위젯 변경
 
@@ -44,7 +46,7 @@ class Application(tk.Frame):
 
             joy=str(ser.readline())#아두이노에서 들어온 시리얼값 저장
             num = re.findall("\d+", joy)#시리얼값에서 필요한 부분만 저장
-            if(num[0] != "0")
+            if(num[0] != "0"):
                 connect.sendMessage(num[0])
             del(num)
     def Button_command1(self):
@@ -62,7 +64,7 @@ class Application(tk.Frame):
         global connect
         connect.sendMessage("Disconnect")
         checkQcheck = False
-
+        input_joystick_check = False
         self.master.destroy()
 
 
