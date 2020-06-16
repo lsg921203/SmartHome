@@ -36,7 +36,7 @@ class Application(tk.Frame):
         print(Voice_controls)
         room_img_dir = "refs/room/IOT" + Voice_controls[0] + Voice_controls[1] + Voice_controls[2] + ".png"
         self.img_room = tk.PhotoImage(file=room_img_dir)
-        self.img_viewer_room["image"] = self.img_room
+        self.img_viewer_room.create_image(0,0,anchor='nw',image=self.img_room)
 
 
     def Exit(self):# 이건 지우지 말기
