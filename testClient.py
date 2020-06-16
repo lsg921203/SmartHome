@@ -5,7 +5,8 @@ import tkinter as tk
 import time
 ##########################
 checkQcheck =False
-HOST = "192.168.22.127"
+#HOST = "192.168.22.127"#LSG(SungGyeol)
+HOST = "192.168.22.92"#NYK
 PORT = 9999
 connect = client_connect.client_connect(HOST, PORT, "TEST")
 #########################################
