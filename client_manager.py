@@ -26,6 +26,7 @@ class Application(tk.Frame):
 
         self.Exit = tk.Button(self.master, font=60, text='Exit', command=self.Exit)# 이건 지우지 말기
         self.Exit.place(x=280, y=580)
+        self.Room_change()
         #self.up_web = tk.Button(self, width=10, font=60, text='web upload')
         #self.up_web.pack()
 
@@ -84,22 +85,29 @@ def TV_off():
         num = 0
     Voice_controls[0] = str(num)
 def checkQueue(checkQcheck,commandQ):
-    global  connect
+    global connect
+    global A
     while checkQcheck:
         if(commandQ.qsize()>0):
             message = commandQ.get(0)
             if message == "LED on": # 해당 커맨드에 따라서
                 LED_on()
+                A.Room_change()
             elif message == "LED off":
                 LED_off()
+                A.Room_change()
             elif message == "AC on":
                 AC_on()
+                A.Room_change()
             elif message == "AC off":
                 AC_off()
+                A.Room_change()
             elif message == "TV on":
                 TV_on()
+                A.Room_change()
             elif message == "TV off":
                 TV_off()
+                A.Room_change()
     connect.closeSoc()
 #################################################################
 def getCommand():
@@ -111,10 +119,11 @@ def getCommand():
     t1 = threading.Thread(target=checkQueue, args=(lambda:checkQcheck,connect.getCommandQueue()))
     t1.start()
 
-def main():
-    root = tk.Tk()
-    A = Application(root)
+def main(root):
+
     getCommand()
     root.mainloop()
 
-main()
+root = tk.Tk()
+A = Application(root)
+main(root)
