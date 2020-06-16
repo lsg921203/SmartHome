@@ -29,6 +29,8 @@ class Application(tk.Frame):
         self.create_widgets()
         self.state = "0"
         self.input_joystick_check = True
+        th = threading.Thread(target= self.input_joystick)
+        th.start()
 
     def create_widgets(self):  # 여기에서 위젯 변경
 
@@ -62,7 +64,7 @@ class Application(tk.Frame):
         global connect
         connect.sendMessage("Disconnect")
         checkQcheck = False
-
+        input_joystick_check = False
         self.master.destroy()
 
 
