@@ -1,32 +1,35 @@
-import time,serial
+import time, serial
+
+
 class voice_machine:
-    def __init__(self,targetParts):
-        port="/dev/ttyAMA0"
+    def __init__(self, targetParts):
+        port = "/dev/ttyAMA0"
         rate = 9600
-        self.ser=serial.Serial(port,rate)
+        self.ser = serial.Serial(port, rate)
         self.ser.parity = serial.PARITY_NONE
-        self.ser.bytesize=serial.EIGHTBITS
-        self.Modes=["hear2Act","userSetting"]
-        #self.targetParts=[["door","closed"], ["LED","off","None"], ["window","closed"], ["AC","off"], ["TV","off"]]
-        self.targetParts=targetParts
-        
-    def mode(self,Mode):
-        if Mode==self.Modes[0]:
+        self.ser.bytesize = serial.EIGHTBITS
+        self.Modes = ["hear2Act", "userSetting"]
+        # self.targetParts=[["door","closed"], ["LED","off","None"], ["window","closed"], ["AC","off"], ["TV","off"]]
+        self.targetParts = targetParts
+
+    def mode(self, Mode):
+        if Mode == self.Modes[0]:
             print(self.Modes[0])
             if self.ser.isOpen():
                 self.ser.close()
             self.ser.open()
-            #print('serial open')
+            # print('serial open')
             self.ser.flushInput()
             self.ser.flushOutput()
             time.sleep(0.1)
-            #print('test command')
+            # print('test command')
             self.ser.write(serial.to_bytes([0xAA]))
             self.ser.write(serial.to_bytes([0x21]))
             time.sleep(0.3)
+
             print('hearing...')
             return self.hear2Act2()
-        elif Mode==self.Modes[1]:
+        elif Mode == self.Modes[1]:
             print(self.Modes[1])
 
     def wait_command(self):
@@ -299,8 +302,9 @@ class voice_machine:
             self.wait_command()
             self.ser.close()
             print('waiting')
-            return self.targetParts[0] # 알아들음
-        return self.targetParts[5]# 못 알아들음
+            return self.targetParts[0]  # 알아들음
+        return self.targetParts[5]  # 못 알아들음
+
     def LED_selection(self):
         print("1.kyuzo 2.kkuzo")
         command = self.ser.readline()
@@ -320,9 +324,11 @@ class voice_machine:
             print('waiting')
             self.ser.close()
             return self.targetParts[1]
-        return self.targetParts[5]# 못 알아들음
+        return self.targetParts[5]  # 못 알아들음
+
     def Window_selection(self):
         return self.targetParts[5]  # 못 알아들음
+
     def AC_selection(self):
         print("1.teuluju 2.kkujo")
         command = self.ser.readline()
@@ -342,14 +348,15 @@ class voice_machine:
             print('waiting')
             self.ser.close()
             return self.targetParts[3]
-        return self.targetParts[5]# 못 알아들음
+        return self.targetParts[5]  # 못 알아들음
+
     def TV_selection(self):
         print("1.teuluju 2.kkujo")
         command = self.ser.readline()
         print(command)
         if command == b'Result:14\r\n':
             self.targetParts[4][1] = "on"
-            print("AC turned on")
+            print("TV turned on")
             self.wait_command()
             print('waiting')
             self.ser.close()
@@ -357,14 +364,14 @@ class voice_machine:
 
         elif command == b'Result:15\r\n':
             self.targetParts[4][1] = "off"
-            print("AC turned off")
+            print("TV turned off")
             self.wait_command()
             print('waiting')
             self.ser.close()
             return self.targetParts[3]
         return self.targetParts[5]  # 못 알아들음
 
-    def import_ch_2(self,partsName):
+    def import_ch_2(self, partsName):
 
         self.ser.write(serial.to_bytes([0xAA]))
         self.ser.write(serial.to_bytes([0x22]))
@@ -404,13 +411,15 @@ class voice_machine:
             print(partsName)
             return self.TV_selection()
 
-    def hear2Atct2(self):
+    def hear2Act2(self):
         cnt = 0
         msg = ""
 
         cnt = 0
         msg = ""
         try:
+            command = self.ser.readline()
+            print(command)
             print("1.hyunkwanmoon, 2.LED 3.changmoon 4.Aircon 5.TV")
             command = self.ser.readline()
             print(command)
@@ -420,6 +429,8 @@ class voice_machine:
                 print('waiting')
                 time.sleep(0.3)
 
+                command = self.ser.readline()
+                print(command)
                 self.import_ch_2("Door")
             elif command == b'Result:12\r\n':  # LED
                 self.wait_command()
@@ -427,6 +438,8 @@ class voice_machine:
                 print('waiting')
                 time.sleep(0.3)
 
+                command = self.ser.readline()
+                print(command)
                 self.import_ch_2("LED")
             elif command == b'Result:13\r\n':  # Window
                 self.wait_command()
@@ -434,6 +447,8 @@ class voice_machine:
                 print('waiting')
                 time.sleep(0.3)
 
+                command = self.ser.readline()
+                print(command)
                 self.import_ch_2("Window")
             elif command == b'Result:14\r\n':  # AC
                 self.wait_command()
@@ -441,6 +456,8 @@ class voice_machine:
                 print('waiting')
                 time.sleep(0.3)
 
+                command = self.ser.readline()
+                print(command)
                 self.import_ch_2("AC")
             elif command == b'Result:15\r\n':  # TV
                 self.wait_command()
@@ -448,6 +465,8 @@ class voice_machine:
                 print('waiting')
                 time.sleep(0.3)
 
+                command = self.ser.readline()
+                print(command)
                 self.import_ch_2("TV")
         except KeyboardInterrupt:
             print('voice command ended.')
@@ -456,3 +475,4 @@ class voice_machine:
             self.wait_command()
             time.sleep(0.3)
             self.ser.close()
+
