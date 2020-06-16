@@ -89,9 +89,9 @@ class Application(tk.Frame):
         self.command11.place(x=250, y=710)
         self.command12 = tk.Button(self.master, font=60, text='M AC off', command=self.Button_command12)
         self.command12.place(x=370, y=710)
-        self.command11 = tk.Button(self.master, font=60, text='M TV on', command=self.Button_command11)
+        self.command11 = tk.Button(self.master, font=60, text='M TV on', command=self.Button_command13)
         self.command11.place(x=490, y=710)
-        self.command12 = tk.Button(self.master, font=60, text='M TV off', command=self.Button_command12)
+        self.command12 = tk.Button(self.master, font=60, text='M TV off', command=self.Button_command14)
         self.command12.place(x=610, y=710)
 
         self.Exit = tk.Button(self.master, font=60, text='Exit', command=self.Exit)
