@@ -4,10 +4,15 @@ import queue
 import tkinter as tk
 import time
 import voice_machine
+import serial
+import re
 
 ##########################
 checkQcheck = False
 # HOST = "192.168.22.127"#LSG(SungGyeol)
+
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout = None)#시리얼 포트 설정
+
 HOST = "192.168.22.127"  # NYK
 PORT = 9999
 connect = client_connect.client_connect(HOST, PORT, "Voice")
@@ -23,6 +28,7 @@ class Application(tk.Frame):
         self.master.geometry('600x600+100+100')  # 윈도우창 크기 조절
         self.create_widgets()
         self.state = "0"
+        self.input_joystick_check = True
 
     def create_widgets(self):  # 여기에서 위젯 변경
 
@@ -33,7 +39,14 @@ class Application(tk.Frame):
         self.Exit.place(x=280, y=555)
         # self.up_web = tk.Button(self, width=10, font=60, text='web upload')
         # self.up_web.pack()
+    def input_joystick(self):
+        while self.input_joystick_check:
 
+            joy=str(ser.readline())#아두이노에서 들어온 시리얼값 저장
+            num = re.findall("\d+", joy)#시리얼값에서 필요한 부분만 저장
+            if(num[0] != "0")
+                connect.sendMessage(num[0])
+            del(num)
     def Button_command1(self):
         global connect
         global targetParts
