@@ -81,6 +81,18 @@ class Application(tk.Frame):
         self.command8 = tk.Button(self.master, font=60, text='MC 2', command=self.Button_command8)
         self.command8.place(x=370, y=660)
 
+        self.command9 = tk.Button(self.master, font=60, text='M LED on', command=self.Button_command9)
+        self.command9.place(x=10, y=710)
+        self.command10 = tk.Button(self.master, font=60, text='M LED off', command=self.Button_command10)
+        self.command10.place(x=130, y=710)
+        self.command11 = tk.Button(self.master, font=60, text='M AC on', command=self.Button_command11)
+        self.command11.place(x=250, y=710)
+        self.command12 = tk.Button(self.master, font=60, text='M AC off', command=self.Button_command12)
+        self.command12.place(x=370, y=710)
+        self.command11 = tk.Button(self.master, font=60, text='M TV on', command=self.Button_command11)
+        self.command11.place(x=490, y=710)
+        self.command12 = tk.Button(self.master, font=60, text='M TV off', command=self.Button_command12)
+        self.command12.place(x=610, y=710)
 
         self.Exit = tk.Button(self.master, font=60, text='Exit', command=self.Exit)
         self.Exit.place(x=320, y=260)
@@ -126,6 +138,30 @@ class Application(tk.Frame):
         #wait_f_check = False
         commandQueue.put("MortorCamera,2")
 
+    def Button_command9(self):
+        global commandQueue
+        #wait_f_check = False
+        commandQueue.put("Manager,LED on")
+    def Button_command10(self):
+        global commandQueue
+        #wait_f_check = False
+        commandQueue.put("Manager,LED off")
+    def Button_command11(self):
+        global commandQueue
+        #wait_f_check = False
+        commandQueue.put("Manager,AC on")
+    def Button_command12(self):
+        global commandQueue
+        #wait_f_check = False
+        commandQueue.put("Manager,AC off")
+    def Button_command13(self):
+        global commandQueue
+        #wait_f_check = False
+        commandQueue.put("Manager,TV on")
+    def Button_command14(self):
+        global commandQueue
+        #wait_f_check = False
+        commandQueue.put("Manager,TV off")
 
     def Exit(self):
         global wait_c_check
