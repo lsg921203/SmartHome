@@ -91,7 +91,7 @@ def func2():
 def camera_on(ld_coc):
     v_connect = video_connect.video_connect(HOST, VIDEOPORT2, 1)
     c = picamera.PiCamera()
-    c.resolution = (320, 240)
+    c.resolution = (150, 100)
     path = "refs/tmp.png"
     print(ld_coc())
     while(ld_coc()):
