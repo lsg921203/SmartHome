@@ -44,7 +44,7 @@ class Application(tk.Frame):
 
             joy=str(ser.readline())#아두이노에서 들어온 시리얼값 저장
             num = re.findall("\d+", joy)#시리얼값에서 필요한 부분만 저장
-            if(num[0] != "0")
+            if(num[0] != "0"):
                 connect.sendMessage(num[0])
             del(num)
     def Button_command1(self):
