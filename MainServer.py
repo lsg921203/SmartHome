@@ -321,12 +321,33 @@ def Voice_Command(message,commandQueue):
     elif(message=="LED on"):
         command = "Manager,LED on"
         commandQueue.put(command)
+    elif (message == "LED off"):
+        command = "Manager,LED off"
+        commandQueue.put(command)
+    elif (message == "AC on"):
+        command = "Manager,AC on"
+        commandQueue.put(command)
+    elif (message == "AC off"):
+        command = "Manager,AC off"
+    elif (message == "TV on"):
+        command = "Manager,TV on"
+        commandQueue.put(command)
+    elif (message == "TV off"):
+        command = "Manager,TV off"
     elif(message=="1"):
         command = "MortorCamera,1"
         commandQueue.put(command)
     elif(message=="2"):
         command = "MortorCamera,2"
         commandQueue.put(command)
+    elif (message == "None None"):
+        command = "MortorCamera,1"
+        commandQueue.put(command)
+        command = "MortorCamera,2"
+        commandQueue.put(command)
+        command = "Door,warning"
+        commandQueue.put(command)
+
 
 def Door_activity(message,commandQueue):
     if(message=="bell"):
