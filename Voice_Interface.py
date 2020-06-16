@@ -10,8 +10,8 @@ checkQcheck =False
 HOST = "192.168.22.157"#NYK
 PORT = 9999
 connect = client_connect.client_connect(HOST, PORT, "Voice")
-targetParts=[["door","closed"], ["LED","off","None"], ["window","closed"], ["AC","off"], ["TV","off"]]
-vcm=voice_machine.voice_machine(targetParts)
+targetParts=[["Door","open"], ["LED","on"], ["Window","open"], ["AC","on"], ["TV","on"],["None","None"]]
+
 #########################################
 class Application(tk.Frame):
 
@@ -38,11 +38,12 @@ class Application(tk.Frame):
 
     def Button_command1(self):
         global connect
+        global targetParts
+        vcm=voice_machine.voice_machine(targetParts)
         aa=vcm.mode("hear2Act")
         print(aa)
         Msg=aa[0]+" "+aa[1]
         print(Msg)
-        connect.sendMessage("yo")
         connect.sendMessage(Msg)
 
 
