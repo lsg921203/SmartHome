@@ -41,7 +41,7 @@ class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
-        self.master.geometry('670x300+100+100')  # 윈도우창 크기 1600*900, 위치:100,100
+        self.master.geometry('330x160+100+100')  # 윈도우창 크기 1600*900, 위치:100,100
         #self.master.resizable(True, True)
         #self.pack()
         self.effect = ['negative', 'sketch', 'pastel', 'watercolor']
@@ -53,49 +53,49 @@ class Application(tk.Frame):
     def create_widgets(self):
 
         self.img = tk.PhotoImage(file="refs/mic_img.png")#file="refs/mic_img.png"
-        self.img_viewer1 = tk.Canvas(height=240, width=320)
+        self.img_viewer1 = tk.Canvas(height=100, width=150)
         self.img_viewer1.place(x=10,y=10)
         self.img_viewer1.create_image(0,0,anchor='nw',image=self.img)
 
-        self.img_viewer2 = tk.Canvas(height=240, width=320)
-        self.img_viewer2.place(x=340, y=10)
+        self.img_viewer2 = tk.Canvas(height=100, width=150)
+        self.img_viewer2.place(x=170, y=10)
         self.img_viewer2.create_image(0, 0, anchor='nw', image=self.img)
         #self.fname = tk.Label(self.master, text='')
         #self.fname.pack()
 
         self.command1 = tk.Button(self.master, font=60, text='Door open', command=self.Button_command1)
-        self.command1.place( x=10 , y=610)
+        self.command1.place( x=10 , y=170)
         self.command2 = tk.Button(self.master, font=60, text='Door warning', command=self.Button_command2)
-        self.command2.place(x=130, y=610)
+        self.command2.place(x=130, y=170)
         self.command3 = tk.Button(self.master, font=60, text='Door start camera', command=self.Button_command3)
-        self.command3.place(x=250, y=610)
+        self.command3.place(x=265, y=170)
         self.command4 = tk.Button(self.master, font=60, text='Door end camera', command=self.Button_command4)
-        self.command4.place(x=370, y=610)
+        self.command4.place(x=445, y=170)
 
         self.command5 = tk.Button(self.master, font=60, text='MC start camera', command=self.Button_command5)
-        self.command5.place(x=10, y=660)
+        self.command5.place(x=10, y=220)
         self.command6 = tk.Button(self.master, font=60, text='MC end camera', command=self.Button_command6)
-        self.command6.place(x=130, y=660)
+        self.command6.place(x=190, y=220)
         self.command7 = tk.Button(self.master, font=60, text='MC 1', command=self.Button_command7)
-        self.command7.place(x=250, y=660)
+        self.command7.place(x=370, y=220)
         self.command8 = tk.Button(self.master, font=60, text='MC 2', command=self.Button_command8)
-        self.command8.place(x=370, y=660)
+        self.command8.place(x=450, y=220)
 
         self.command9 = tk.Button(self.master, font=60, text='M LED on', command=self.Button_command9)
-        self.command9.place(x=10, y=710)
+        self.command9.place(x=10, y=270)
         self.command10 = tk.Button(self.master, font=60, text='M LED off', command=self.Button_command10)
-        self.command10.place(x=130, y=710)
+        self.command10.place(x=130, y=270)
         self.command11 = tk.Button(self.master, font=60, text='M AC on', command=self.Button_command11)
-        self.command11.place(x=250, y=710)
+        self.command11.place(x=250, y=270)
         self.command12 = tk.Button(self.master, font=60, text='M AC off', command=self.Button_command12)
-        self.command12.place(x=370, y=710)
+        self.command12.place(x=370, y=270)
         self.command11 = tk.Button(self.master, font=60, text='M TV on', command=self.Button_command13)
-        self.command11.place(x=490, y=710)
+        self.command11.place(x=490, y=270)
         self.command12 = tk.Button(self.master, font=60, text='M TV off', command=self.Button_command14)
-        self.command12.place(x=610, y=710)
+        self.command12.place(x=610, y=270)
 
         self.Exit = tk.Button(self.master, font=60, text='Exit', command=self.Exit)
-        self.Exit.place(x=320, y=260)
+        self.Exit.place(x=145, y=120)
 
         #self.up_web = tk.Button(self, width=10, font=60, text='web upload')
         #self.up_web.pack()
