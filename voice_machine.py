@@ -35,6 +35,7 @@ class voice_machine:
     def wait_command(self):
         self.ser.write(serial.to_bytes([0xAA]))
         self.ser.write(serial.to_bytes([0x00]))
+        time.sleep(0.4)
 
     '''
         def hear2Act(self):
@@ -297,32 +298,27 @@ class voice_machine:
     def Door_selection(self):
         print("1.yeoluju")
         command = self.ser.readline()
+        command = self.ser.readline()
         print(command)
         if command == b'Result:13\r\n':
-            self.wait_command()
-            self.ser.close()
-            print('waiting')
             return self.targetParts[0]  # 알아들음
         return self.targetParts[5]  # 못 알아들음
 
     def LED_selection(self):
         print("1.kyuzo 2.kkuzo")
         command = self.ser.readline()
+        command = self.ser.readline()
         print(command)
-        if command == b'Result:11\r\n':
+        if command == b'Result:12\r\n':
             self.targetParts[1][1] = "on"
             print("LED turned on")
-            self.wait_command()
-            print('waiting')
-            self.ser.close()
+
             return self.targetParts[1]
 
-        elif command == b'Result:12\r\n':
+        elif command == b'Result:15\r\n':
             self.targetParts[1][1] = "off"
             print("LED turned off")
-            self.wait_command()
-            print('waiting')
-            self.ser.close()
+
             return self.targetParts[1]
         return self.targetParts[5]  # 못 알아들음
 
@@ -332,43 +328,37 @@ class voice_machine:
     def AC_selection(self):
         print("1.teuluju 2.kkujo")
         command = self.ser.readline()
+        command = self.ser.readline()
         print(command)
         if command == b'Result:14\r\n':
             self.targetParts[3][1] = "on"
             print("AC turned on")
-            self.wait_command()
-            print('waiting')
-            self.ser.close()
+
             return self.targetParts[3]
 
         elif command == b'Result:15\r\n':
             self.targetParts[3][1] = "off"
             print("AC turned off")
-            self.wait_command()
-            print('waiting')
-            self.ser.close()
+
             return self.targetParts[3]
         return self.targetParts[5]  # 못 알아들음
 
     def TV_selection(self):
         print("1.teuluju 2.kkujo")
         command = self.ser.readline()
+        command = self.ser.readline()
         print(command)
-        if command == b'Result:14\r\n':
+        if command == b'Result:14\r\n' or b'Result:13\r\n' or b'Result:12\r\n':
             self.targetParts[4][1] = "on"
             print("TV turned on")
-            self.wait_command()
-            print('waiting')
-            self.ser.close()
-            return self.targetParts[3]
+
+            return self.targetParts[4]
 
         elif command == b'Result:15\r\n':
             self.targetParts[4][1] = "off"
             print("TV turned off")
-            self.wait_command()
-            print('waiting')
-            self.ser.close()
-            return self.targetParts[3]
+
+            return self.targetParts[4]
         return self.targetParts[5]  # 못 알아들음
 
     def import_ch_2(self, partsName):
@@ -431,7 +421,7 @@ class voice_machine:
 
                 command = self.ser.readline()
                 print(command)
-                self.import_ch_2("Door")
+                return self.import_ch_2("Door")
             elif command == b'Result:12\r\n':  # LED
                 self.wait_command()
 
@@ -440,7 +430,7 @@ class voice_machine:
 
                 command = self.ser.readline()
                 print(command)
-                self.import_ch_2("LED")
+                return self.import_ch_2("LED")
             elif command == b'Result:13\r\n':  # Window
                 self.wait_command()
 
@@ -449,7 +439,7 @@ class voice_machine:
 
                 command = self.ser.readline()
                 print(command)
-                self.import_ch_2("Window")
+                return self.import_ch_2("Window")
             elif command == b'Result:14\r\n':  # AC
                 self.wait_command()
 
@@ -458,7 +448,7 @@ class voice_machine:
 
                 command = self.ser.readline()
                 print(command)
-                self.import_ch_2("AC")
+                return self.import_ch_2("AC")
             elif command == b'Result:15\r\n':  # TV
                 self.wait_command()
 
@@ -467,7 +457,7 @@ class voice_machine:
 
                 command = self.ser.readline()
                 print(command)
-                self.import_ch_2("TV")
+                return self.import_ch_2("TV")
         except KeyboardInterrupt:
             print('voice command ended.')
             pass
@@ -475,4 +465,5 @@ class voice_machine:
             self.wait_command()
             time.sleep(0.3)
             self.ser.close()
+
 
