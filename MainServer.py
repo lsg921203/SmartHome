@@ -85,24 +85,24 @@ class Application(tk.Frame):
 
     def Button_command1(self):
         global commandQueue
-        commandQueue.put("MortorCamera,1")
+        commandQueue.put("Door,door open")
 
         #print("TEST Voice,hi")
     def Button_command2(self):
         global commandQueue
         global wait_f_check
         wait_f_check = True
-        commandQueue.put("MortorCamera,start camera")
+        commandQueue.put("Door,warning")
 
     def Button_command3(self):
         global commandQueue
         #wait_f_check = False
-        commandQueue.put("MortorCamera,end camera")
+        commandQueue.put("Door,start camera")
 
     def Button_command4(self):
         global commandQueue
         #wait_f_check = False
-        commandQueue.put("MortorCamera,2")
+        commandQueue.put("Door,end camera")
 
     def Exit(self):
         global wait_c_check
