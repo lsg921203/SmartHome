@@ -32,7 +32,7 @@ class Application(tk.Frame):
 
     def Room_change(self):
         global Voice_controls
-        global room_img_dir
+        #global room_img_dir
         print(Voice_controls)
         room_img_dir = "refs/room/IOT" + Voice_controls[0] + Voice_controls[1] + Voice_controls[2] + ".png"
         self.img_room = tk.PhotoImage(file=room_img_dir)
@@ -64,26 +64,27 @@ def AC_on():
     num = int(Voice_controls[1])
     num += 1
     if (num > 1):
-        num = 2
-    Voice_controls[0] = str(num)
+        num = 1
+    Voice_controls[1] = str(num)
 def AC_off():
     num = int(Voice_controls[1])
     num -= 1
     if (num < 0):
         num = 0
+    Voice_controls[1] = str(num)
 def TV_on():
     num = int(Voice_controls[2])
     num += 1
     if (num > 1):
-        num = 2
-    Voice_controls[0] = str(num)
+        num = 1
+    Voice_controls[2] = str(num)
 
 def TV_off():
     num = int(Voice_controls[2])
     num -= 1
     if (num < 0):
         num = 0
-    Voice_controls[0] = str(num)
+    Voice_controls[2] = str(num)
 def checkQueue(checkQcheck,commandQ):
     global connect
     global A
