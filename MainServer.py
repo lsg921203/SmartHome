@@ -63,17 +63,24 @@ class Application(tk.Frame):
         #self.fname = tk.Label(self.master, text='')
         #self.fname.pack()
 
-        self.command1 = tk.Button(self.master, font=60, text='command1', command=self.Button_command1)
+        self.command1 = tk.Button(self.master, font=60, text='Door open', command=self.Button_command1)
         self.command1.place( x=10 , y=610)
-
-        self.command2 = tk.Button(self.master, font=60, text='command2', command=self.Button_command2)
+        self.command2 = tk.Button(self.master, font=60, text='Door warning', command=self.Button_command2)
         self.command2.place(x=130, y=610)
-
-        self.command3 = tk.Button(self.master, font=60, text='command3', command=self.Button_command3)
+        self.command3 = tk.Button(self.master, font=60, text='Door start camera', command=self.Button_command3)
         self.command3.place(x=250, y=610)
-
-        self.command4 = tk.Button(self.master, font=60, text='command3', command=self.Button_command4)
+        self.command4 = tk.Button(self.master, font=60, text='Door end camera', command=self.Button_command4)
         self.command4.place(x=370, y=610)
+
+        self.command5 = tk.Button(self.master, font=60, text='MC start camera', command=self.Button_command5)
+        self.command5.place(x=10, y=660)
+        self.command6 = tk.Button(self.master, font=60, text='MC end camera', command=self.Button_command6)
+        self.command6.place(x=130, y=660)
+        self.command7 = tk.Button(self.master, font=60, text='MC 1', command=self.Button_command7)
+        self.command7.place(x=250, y=660)
+        self.command8 = tk.Button(self.master, font=60, text='MC 2', command=self.Button_command8)
+        self.command8.place(x=370, y=660)
+
 
         self.Exit = tk.Button(self.master, font=60, text='Exit', command=self.Exit)
         self.Exit.place(x=320, y=260)
@@ -93,16 +100,32 @@ class Application(tk.Frame):
         global wait_f_check
         wait_f_check = True
         commandQueue.put("Door,warning")
-
     def Button_command3(self):
         global commandQueue
         #wait_f_check = False
         commandQueue.put("Door,start camera")
-
     def Button_command4(self):
         global commandQueue
         #wait_f_check = False
         commandQueue.put("Door,end camera")
+
+    def Button_command5(self):
+        global commandQueue
+        #wait_f_check = False
+        commandQueue.put("MortorCamera,start camera")
+    def Button_command6(self):
+        global commandQueue
+        #wait_f_check = False
+        commandQueue.put("MortorCamera,end camera")
+    def Button_command7(self):
+        global commandQueue
+        #wait_f_check = False
+        commandQueue.put("MortorCamera,1")
+    def Button_command8(self):
+        global commandQueue
+        #wait_f_check = False
+        commandQueue.put("MortorCamera,2")
+
 
     def Exit(self):
         global wait_c_check
@@ -257,8 +280,18 @@ def video_q_reader(app,videoNum):
 ###################################################################
 def Voice_Command(message,commandQueue):
     if(message=="door open"):
-        command = "Bell/kuku,Open"
-        commandQueue.put()
+        command = "Door,door open"
+        commandQueue.put(command)
+    elif(message=="LED on"):
+        command = "Manager,LED on"
+        commandQueue.put(command)
+    elif(message=="1"):
+        command = "MortorCamera,1"
+        commandQueue.put(command)
+    elif(message=="2"):
+        command = "MortorCamera,2"
+        commandQueue.put(command)
+
 def Door_activity(message,commandQueue):
     if(message=="bell"):
         global wait_f_check
@@ -273,6 +306,7 @@ def activity(ld_ac,messageQueue,commandQueue):
     while ld_ac():
         if messageQueue.qsize()>0:
             message = messageQueue.get(0)
+            print(message)
             messagelist = message.split(",")
             if messagelist[0]=="Voice":
                 print("Voice")
@@ -280,8 +314,8 @@ def activity(ld_ac,messageQueue,commandQueue):
             elif messagelist[0]=="Door":
                 print("Door")
                 Door_activity(messagelist[1],commandQueue)
-            elif messagelist[0]=="TEST":
-                print("TEST")
+            elif messagelist[0]=="MortorCamera":
+                print("MortorCamera")
             ##여기에 파츠 추가
     print("close activity thread!")
 
