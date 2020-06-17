@@ -315,7 +315,7 @@ def video_q_reader(app,videoNum):
     print("close video_q_reader thread")
 ###################################################################
 def Voice_Command(message,commandQueue):
-    if(message=="door open"):
+    if(message=="Door open"):
         command = "Door,door open"
         commandQueue.put(command)
     elif(message=="LED on"):
