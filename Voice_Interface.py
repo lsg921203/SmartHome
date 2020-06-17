@@ -35,10 +35,10 @@ class Application(tk.Frame):
     def create_widgets(self):  # 여기에서 위젯 변경
 
         self.command1 = tk.Button(self.master, font=60, text='voice command', command=self.Button_command1)
-        self.command1.place(x=245, y=610)
+        self.command1.place(x=245, y=100)
 
         self.Exit = tk.Button(self.master, font=60, text='Exit', command=self.Exit)  # 이건 지우지 말기
-        self.Exit.place(x=280, y=555)
+        self.Exit.place(x=280, y=250)
         # self.up_web = tk.Button(self, width=10, font=60, text='web upload')
         # self.up_web.pack()
     def input_joystick(self):
